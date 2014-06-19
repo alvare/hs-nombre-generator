@@ -7,7 +7,7 @@ version:             0.1.0.0
 -- description:         
 license:             MIT
 license-file:        LICENSE
-author:              ezequiel alvarez
+author:              Ezequiel Alvarez
 -- maintainer:          
 -- copyright:           
 category:            Web
@@ -15,6 +15,8 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 executable hs-nombre-generator
-  -- main-is:             
+  main-is:             Web/NombreGenerator.hs
   -- other-modules:       
   build-depends:       base ==4.6.*
+                     , HandsomeSoup
+                     , hxt
