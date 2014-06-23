@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                hs-nombre-generator
-version:             0.1.0.0
+version:             0.1.1.0
 -- synopsis:            
 -- description:         
 license:             MIT
@@ -16,7 +16,8 @@ cabal-version:       >=1.8
 
 executable hs-nombre-generator
   main-is:             Web/NombreGenerator.hs
+  ghc-options:         -O2
   -- other-modules:       
-  build-depends:       base ==4.6.*
-                     , HandsomeSoup
+  build-depends:       base >=4.6.0
                      , hxt
+                     , HandsomeSoup

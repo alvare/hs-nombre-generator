@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 module Main where
 
 import Text.XML.HXT.Core
@@ -5,22 +6,32 @@ import Text.HandsomeSoup
 import System.Environment
 import System.Exit
 
-parse :: [String] -> IO Int
-parse ["-h"] = usage >> exit
-parse ["-v"] = version >> exit
-parse [s] = return (read s :: Int)
-parse [] = needCount >> die
+parseArgs :: [String] -> IO Int
+parseArgs ["-h"] = usage >> exit
+parseArgs ["-v"] = version >> exit
+parseArgs [s] = return (read s :: Int)
+parseArgs [] = putStrLn "I need to know how many names you want..." >> die
 
 usage = putStrLn "Usage: hs-nombre-generator [-h] [count ..]"
 version = putStrLn "Haskell NombreGenerator 0.1"
-needCount = putStrLn "I need to know how many names you want..."
-exit = exitWith ExitSuccess
+exit = exitSuccess
 die = exitWith (ExitFailure 1)
 
-doc = fromUrl "http://www.buenosaires.gob.ar/areas/registrocivil/nombres/busqueda/imprimir.php?sexo=ambos"
+--url = "http://www.buenosaires.gob.ar/areas/registrocivil/nombres/busqueda/imprimir.php?sexo=ambos"
 
-magic count = do
-    names <- runX $ doc >>> css ".contenido tbody tr" >>> listA (getChildren >>> hasName "td" /> getText) >>. map head
+lala url = readDocument [withParseHTML yes,
+                         withInputEncoding isoLatin1,
+                         withCheckNamespaces no,
+                         withParseByMimeType no
+                         --withTagSoup
+                         --withWarnings no,
+                         ]
+                         url
+
+doc = traceMsg 0 "Reading..." >>> lala "Nombres.html" >>> traceMsg 0 "Parsed"
+
+magic !count = do
+    names <- runX $ doc  >>> css ".contenido tbody tr" >>> listA (getChildren >>> hasName "td" /> getText) >>. map head
     mapM_ putStrLn $ take count names
 
-main = getArgs >>= parse >>= magic
+main = getArgs >>= parseArgs >>= magic
