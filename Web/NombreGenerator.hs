@@ -5,6 +5,7 @@ import Text.XML.HXT.Core
 import Text.HandsomeSoup
 import System.Environment
 import System.Exit
+import Web.NombreGenerator.RandomUtil
 
 parseArgs :: [String] -> IO Int
 parseArgs ["-h"] = usage >> exit
@@ -17,21 +18,30 @@ version = putStrLn "Haskell NombreGenerator 0.1"
 exit = exitSuccess
 die = exitWith (ExitFailure 1)
 
---url = "http://www.buenosaires.gob.ar/areas/registrocivil/nombres/busqueda/imprimir.php?sexo=ambos"
+fromWeb = fromUrl "http://www.buenosaires.gob.ar/areas/registrocivil/nombres/busqueda/imprimir.php?sexo=ambos"
 
-lala url = readDocument [withParseHTML yes,
+fromFile = readDocument [withParseHTML yes,
                          withInputEncoding isoLatin1,
                          withCheckNamespaces no,
-                         withParseByMimeType no
-                         --withTagSoup
-                         --withWarnings no,
-                         ]
-                         url
+                         withParseByMimeType no,
+                         withWarnings no] "Nombres.html"
 
-doc = traceMsg 0 "Reading..." >>> lala "Nombres.html" >>> traceMsg 0 "Parsed"
+getDoc = traceMsg 0 "Downloading..." >>>
+         --fromUrl url >>>
+         fromFile >>>
+         traceMsg 0 "Parsing..."
 
-magic !count = do
-    names <- runX $ doc  >>> css ".contenido tbody tr" >>> listA (getChildren >>> hasName "td" /> getText) >>. map head
-    mapM_ putStrLn $ take count names
+takeNames :: Int -> IO [String]
+takeNames !count = runX findNames >>= takeRandom count
 
-main = getArgs >>= parseArgs >>= magic
+findNames :: IOSLA (XIOState ()) XmlTree String
+findNames = getDoc  >>>
+            css ".contenido tbody tr" >>>
+            listA (
+                getChildren >>>
+                hasName "td"
+                /> getText
+            )
+            >>. map head
+
+main = getArgs >>= parseArgs >>= takeNames >>= mapM_ putStrLn
