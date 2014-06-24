@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
 module Web.NombreGenerator.RandomUtil (takeRandom) where
 
 import Data.Random (runRVar)

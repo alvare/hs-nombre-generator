@@ -20,10 +20,8 @@ executable hs-nombre-generator
   -- other-modules:       
   build-depends:       base >=4.6.0
                      , hxt
-                     , mtl
                      , rvar
                      , HandsomeSoup
-                     , random
                      , random-fu
                      , random-extras
                      , random-source
