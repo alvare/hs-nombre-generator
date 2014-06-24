@@ -2,14 +2,14 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                hs-nombre-generator
-version:             0.1.1.0
--- synopsis:            
--- description:         
+version:             0.2.0.0
+synopsis:            Name generator.
+description:         Random name generator with web scrapping.
 license:             MIT
 license-file:        LICENSE
 author:              Ezequiel Alvarez
--- maintainer:          
--- copyright:           
+maintainer:          welcometothechango@gmail.com
+copyright:           (c) Ezequiel Alvarez 2014
 category:            Web
 build-type:          Simple
 cabal-version:       >=1.8
@@ -18,10 +18,7 @@ executable hs-nombre-generator
   main-is:             Web/NombreGenerator.hs
   ghc-options:         -O2
   -- other-modules:       
-  build-depends:       base >=4.6.0
+  build-depends:       base >=4.0 && <4.8
                      , hxt
-                     , rvar
                      , HandsomeSoup
-                     , random-fu
-                     , random-extras
-                     , random-source
+                     , random
