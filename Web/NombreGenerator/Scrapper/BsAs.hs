@@ -1,8 +1,7 @@
-module Web.NombreGenerator.Scrapper.BsAs (takeNames) where
+module Web.NombreGenerator.Scrapper.BsAs (scrap) where
 
 import Text.XML.HXT.Core
 import Text.HandsomeSoup
-import Web.NombreGenerator.RandomUtil
 
 fromWeb = fromUrl "http://www.buenosaires.gob.ar/areas/registrocivil/nombres/busqueda/imprimir.php?sexo=ambos"
 
@@ -13,12 +12,12 @@ fromFile = readDocument [withParseHTML yes,
                          withWarnings no] "Nombres.html"
 
 getDoc = traceMsg 0 "Downloading..." >>>
-         --fromUrl url >>>
-         fromFile >>>
+         fromWeb >>>
+         --fromFile >>>
          traceMsg 0 "Parsing..."
 
-takeNames :: Int -> IO [String]
-takeNames count = runX findNames >>= takeRandom count
+scrap :: IO [String]
+scrap = runX findNames
 
 findNames :: IOSLA (XIOState ()) XmlTree String
 findNames = getDoc  >>>

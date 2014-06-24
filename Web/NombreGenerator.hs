@@ -2,6 +2,7 @@ module Main where
 
 import System.Environment
 import System.Exit
+import Web.NombreGenerator.RandomUtil
 import Web.NombreGenerator.Scrapper.BsAs
 
 parseArgs :: [String] -> IO Int
@@ -15,4 +16,6 @@ version = putStrLn "Haskell NombreGenerator 0.1"
 exit = exitSuccess
 die = exitWith (ExitFailure 1)
 
-main = getArgs >>= parseArgs >>= takeNames >>= mapM_ putStrLn
+generate n = (randTriples n) =<<  scrap
+
+main = getArgs >>= parseArgs >>= generate >>= mapM_ putStrLn
