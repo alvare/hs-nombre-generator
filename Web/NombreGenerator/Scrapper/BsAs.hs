@@ -16,10 +16,10 @@ getDoc = traceMsg 0 "Downloading..." >>>
          --fromFile >>>
          traceMsg 0 "Parsing..."
 
-scrap :: IO [String]
+scrap :: IO [(String, String)]
 scrap = runX findNames
 
-findNames :: IOSLA (XIOState ()) XmlTree String
+findNames :: IOSLA (XIOState ()) XmlTree (String, String)
 findNames = getDoc  >>>
             css ".contenido tbody tr" >>>
             listA (
@@ -27,4 +27,7 @@ findNames = getDoc  >>>
                 hasName "td"
                 /> getText
             )
-            >>. map head
+            >>. map takeTwo
+
+takeTwo :: [a] -> (a, a)
+takeTwo (x:y:_) = (x, y)
