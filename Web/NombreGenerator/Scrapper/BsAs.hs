@@ -1,7 +1,9 @@
-module Web.NombreGenerator.Scrapper.BsAs (scrap) where
+module Web.NombreGenerator.Scrapper.BsAs (scrap, Name) where
 
 import Text.XML.HXT.Core
 import Text.HandsomeSoup
+
+type Name = (String, String)
 
 fromWeb = fromUrl "http://www.buenosaires.gob.ar/areas/registrocivil/nombres/busqueda/imprimir.php?sexo=ambos"
 
@@ -12,14 +14,14 @@ fromFile = readDocument [withParseHTML yes,
                          withWarnings no] "Nombres.html"
 
 getDoc = traceMsg 0 "Downloading..." >>>
-         fromWeb >>>
-         --fromFile >>>
+         --fromWeb >>>
+         fromFile >>>
          traceMsg 0 "Parsing..."
 
-scrap :: IO [(String, String)]
+scrap :: IO [Name]
 scrap = runX findNames
 
-findNames :: IOSLA (XIOState ()) XmlTree (String, String)
+findNames :: IOSLA (XIOState ()) XmlTree Name
 findNames = getDoc  >>>
             css ".contenido tbody tr" >>>
             listA (
