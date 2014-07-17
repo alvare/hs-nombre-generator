@@ -1,4 +1,4 @@
-module Web.NombreGenerator.Scrapper.BsAs (scrap, Name) where
+module Web.NombreGenerator.Scrapper.BsAs (Name, scrap) where
 
 import Text.XML.HXT.Core
 import Text.HandsomeSoup
