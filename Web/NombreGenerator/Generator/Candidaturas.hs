@@ -1,9 +1,9 @@
-module Web.NombreGenerator.Generator.Candidaturas (FullName, candidaturas) where
+module Web.NombreGenerator.Generator.Candidaturas (Cargo, FullName, candidaturas) where
 
 import Text.Printf
 
 type FullName = (String, String)
-type Categoria = (String, Int, Bool)
+type Cargo = (String, Int, Bool)
 
 data Candidato = Candidato { partido :: Int
                            , lista :: Int
@@ -16,22 +16,22 @@ data Candidato = Candidato { partido :: Int
 
 candidato_format = "('%03d.%03d.%03d', 'Candidato', '%s', '%s', 'NO', 'SI', '{\"norden\": %d, \"titular\": \"%s\", \"sexo\": \"%s\"}'),"
 
-candidaturas :: [Categoria] -> [FullName] -> IO [String]
-candidaturas cats names = return (map printCand (loop1 [] 1 cats names))
+candidaturas :: [Cargo] -> [FullName] -> IO [String]
+candidaturas cats names = return $ reverse (map printCand (loop1 [] 1 cats names))
 
 printCand :: Candidato -> String
 printCand (Candidato p l i n o t' s) = printf candidato_format p l i n n o t s
     where t = if t' then "SI" else "NO"
 
-loop1 :: [Candidato] -> Int -> [Categoria] -> [FullName] -> [Candidato]
+loop1 :: [Candidato] -> Int -> [Cargo] -> [FullName] -> [Candidato]
 loop1 acc idx (cat:xs) names = loop1 (catCands ++ acc) newIdx xs names
     where (catCands, newIdx) = loop2 [] cat 1 idx names
 loop1 acc _ [] _ = acc
 
-loop2 :: [Candidato] -> Categoria -> Int -> Int -> [FullName] -> ([Candidato], Int)
+loop2 :: [Candidato] -> Cargo -> Int -> Int -> [FullName] -> ([Candidato], Int)
 loop2 acc cat orden idx names
-    | is_suplent && orden > maxOrd = loop2 (newCand : acc) (candName, maxOrd, True) 1 (idx + 1) names
-    | orden > maxOrd = (acc, idx)
+    | orden > maxOrd && is_suplent = (acc, idx)
+    | orden > maxOrd && has_suplent = loop2 acc (candName, maxOrd, False) 1 idx names
     | otherwise = loop2 (newCand : acc) cat (orden + 1) (idx + 1) names
     where (candName, maxOrd, has_suplent) = cat
           is_suplent = not has_suplent

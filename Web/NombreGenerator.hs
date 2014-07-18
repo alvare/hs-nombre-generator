@@ -13,24 +13,27 @@ import Web.NombreGenerator.Scrapper.BsAs
 
 type Sex = String
 
-parseArgs :: [String] -> IO Sex
+parseArgs :: [String] -> IO ([Cargo], Sex)
 parseArgs ["-h"] = printUsage >> exit
 parseArgs ["-v"] = printVersion >> exit
-parseArgs ["-f"] = return $ "f"
-parseArgs ["-m"] = return $ "m"
-parseArgs [] = return $ "a"
+parseArgs ["-f", cargs] = return $ eval (cargs, "f")
+parseArgs ["-m", cargs] = return $ eval (cargs, "m")
+parseArgs [cargs] = return $ eval (cargs, "a")
 parseArgs _ = printUsage >> die
+
+eval (c, s) = (read c :: [Cargo]) `seq` (read c :: [Cargo], s)
 
 printUsage = putStrLn "Usage: hs-nombre-generator [-h] [-m/-f] [todo: candidaturas]"
 printVersion = putStrLn $ "NombreGenerator " ++ showVersion version
 exit = exitSuccess
 die = exitWith (ExitFailure 1)
 
-
 format :: [(String, String)] -> (String, String)
-format names_sex = (c ++ ", " ++ a ++ " " ++ b, sex)
+format names_sex = (c ++ ", " ++ a ++ " " ++ b, custom_sex)
     where [a, b, c] = map fst names_sex
           sex = snd . head $ names_sex
+          custom_sex = if sex == "A" then rand_sex else sex
+          rand_sex = if (head a > 'K') then "M" else "F"
 
 randTriples :: Int -> [(String, String)] -> IO [(String, String)]
 randTriples n list = replicateM n (fmap format $ takeRandom 3 list)
@@ -41,8 +44,11 @@ generate scrap sex = (fmap (filter isSex) . randTriples 100) =<<  scrap
     where isSex (_, s) = sex == "a" || (lower s) == sex
           lower = map toLower
 
+candidatos :: [Cargo]
+candidatos = [("INT", 1, False), ("CON", 3, True)]
+
 main = getArgs >>=
-       parseArgs >>=
-       generate scrap >>=
-       candidaturas [("INT", 1, False), ("CON", 3, True)] >>=
-       mapM_ putStrLn
+       parseArgs >>= \(cargos, sex) ->
+           generate scrap sex >>=
+           candidaturas cargos >>=
+           mapM_ putStrLn
