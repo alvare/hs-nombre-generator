@@ -35,7 +35,7 @@ loop2 acc cat orden idx names
     | otherwise = loop2 (newCand : acc) cat (orden + 1) (idx + 1) names
     where (candName, maxOrd, has_suplent) = cat
           is_suplent = not has_suplent
-          (name, sex) = names !! idx
+          (name, sex) = names !! (idx - 1)
           newCand = Candidato {partido=1,
                                lista=1,
                                uid=idx,

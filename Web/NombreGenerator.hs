@@ -1,3 +1,7 @@
+{--
+candidatos :: [Cargo]
+candidatos = [("INT", 1, False), ("CON", 3, True)]
+--}
 module Main where
 
 import Paths_hs_nombre_generator (version)
@@ -39,16 +43,14 @@ randTriples :: Int -> [(String, String)] -> IO [(String, String)]
 randTriples n list = replicateM n (fmap format $ takeRandom 3 list)
 
 --TODO FUCK IO
-generate :: IO [Name] -> Sex -> IO [FullName]
-generate scrap sex = (fmap (filter isSex) . randTriples 100) =<<  scrap
+generate :: IO [Name] -> Sex -> [Cargo] -> IO [FullName]
+generate scrap sex cargos = (fmap (filter isSex) . randTriples count) =<<  scrap
     where isSex (_, s) = sex == "a" || (lower s) == sex
           lower = map toLower
-
-candidatos :: [Cargo]
-candidatos = [("INT", 1, False), ("CON", 3, True)]
+          count = sum . map (\(_, n, supl) -> if supl then n * 2 else n) $ cargos
 
 main = getArgs >>=
        parseArgs >>= \(cargos, sex) ->
-           generate scrap sex >>=
+           generate scrap sex cargos >>=
            candidaturas cargos >>=
            mapM_ putStrLn
