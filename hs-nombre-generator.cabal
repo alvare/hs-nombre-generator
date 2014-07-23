@@ -16,7 +16,14 @@ cabal-version:       >=1.8
 
 executable hs-nombre-generator
   main-is:             Web/NombreGenerator.hs
-  ghc-options:         -O2
+  ghc-options:
+    -O2
+--    -prof
+--    -auto-all
+--    -caf-all
+--    -threaded
+--    -fprof-auto
+--    "-with-rtsopts=-N -p -s -h -i0.1"
   other-modules:       Web.NombreGenerator.RandomUtil
                      , Web.NombreGenerator.Scrapper.BsAs
   build-depends:       base >=4.0 && <4.8
