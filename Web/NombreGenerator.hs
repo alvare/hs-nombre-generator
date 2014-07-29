@@ -1,7 +1,3 @@
-{--
-candidatos :: [Cargo]
-candidatos = [("INT", 1, False), ("CON", 3, True)]
---}
 module Main where
 
 import Paths_hs_nombre_generator (version)
@@ -27,7 +23,7 @@ parseArgs _ = printUsage >> die
 
 eval (c, s) = (read c :: [Cargo]) `seq` (read c :: [Cargo], s)
 
-printUsage = putStrLn "Usage: hs-nombre-generator [-h] [-m/-f] [todo: candidaturas]"
+printUsage = putStrLn "Usage: hs-nombre-generator [-h] [-m/-f] '[('CARGO', Int, False|True), etc]'"
 printVersion = putStrLn $ "NombreGenerator " ++ showVersion version
 exit = exitSuccess
 die = exitWith (ExitFailure 1)
@@ -42,7 +38,6 @@ format names_sex = (c ++ ", " ++ a ++ " " ++ b, custom_sex)
 randTriples :: Int -> [(String, String)] -> IO [(String, String)]
 randTriples n list = replicateM n (fmap format $ takeRandom 3 list)
 
---TODO FUCK IO
 generate :: IO [Name] -> Sex -> [Cargo] -> IO [FullName]
 generate scrap sex cargos = (fmap (filter isSex) . randTriples count) =<<  scrap
     where isSex (_, s) = sex == "a" || (lower s) == sex
