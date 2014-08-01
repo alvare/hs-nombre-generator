@@ -39,7 +39,7 @@ randTriples :: Int -> [(String, String)] -> IO [(String, String)]
 randTriples n list = replicateM n (fmap format $ takeRandom 3 list)
 
 generate :: IO [Name] -> Sex -> [Cargo] -> IO [FullName]
-generate scrap sex cargos = (fmap (filter isSex) . randTriples count) =<<  scrap
+generate names sex cargos = (fmap (filter isSex) . randTriples count) =<< names
     where isSex (_, s) = sex == "a" || (lower s) == sex
           lower = map toLower
           count = sum . map (\(_, n, supl) -> if supl then n * 2 else n) $ cargos
