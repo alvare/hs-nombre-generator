@@ -5,22 +5,23 @@ import Text.Printf
 type FullName = (String, String)
 type Cargo = (String, Int, Bool)
 
-data Candidato = Candidato { partido :: Int
+data Candidato = Candidato { uid :: Int
                            , lista :: Int
-                           , uid :: Int
+                           , cargo :: String
                            , nombre :: String
-                           , orden :: Int
-                           , titular :: Bool
                            , sexo :: String
+                           , titular :: Bool
+                           , orden :: Int
                            } deriving (Show)
 
-candidato_format = "('%03d.%03d.%03d', 'Candidato', '%s', '%s', 'NO', 'SI', '{\"norden\": %d, \"titular\": \"%s\", \"sexo\": \"%s\"}'),"
+candidato_format_sql = "('%03d.%03d.%03d', 'Candidato', '%s', '%s', 'NO', 'SI', '{\"norden\": %d, \"titular\": \"%s\", \"sexo\": \"%s\"}'),"
+candidato_format_csv = "%03d,%03d,%s,,,EJ,\"%s\",%s,%s,,NO,SI,%d"
 
 candidaturas :: [Cargo] -> [FullName] -> IO [String]
 candidaturas cats names = return $ reverse $ map fromatCand $ loop1 [] 1 cats names
 
 fromatCand :: Candidato -> String
-fromatCand (Candidato p l i n o t' s) = printf candidato_format p l i n n o t s
+fromatCand (Candidato i l n c s t' o) = printf candidato_format_csv i l n c s t o
     where t = if t' then "SI" else "NO"
 
 loop1 :: [Candidato] -> Int -> [Cargo] -> [FullName] -> [Candidato]
@@ -36,7 +37,7 @@ loop2 acc cat orden idx names
     where (carg_name, max_ord, has_suplent) = cat
           is_suplent = not has_suplent
           (name, sex) = names !! (idx - 1)
-          newCand = Candidato {partido=1,
+          newCand = Candidato {cargo=carg_name,
                                lista=1,
                                uid=idx,
                                nombre=name,
