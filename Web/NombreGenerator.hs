@@ -45,7 +45,6 @@ generate names sex cargos = (fmap (filter isSex) . randTriples count) =<< names
           count = sum . map (\(_, n, supl) -> if supl then n * 2 else n) $ cargos
 
 main = getArgs >>=
-       parseArgs >>= \(cargos, sex, listas) ->
-           generate scrap sex cargos >>=
-           candidaturas cargos listas >>=
-           mapM_ putStrLn
+       parseArgs >>= \(cargos, sex, listas) -> do
+           names <- generate scrap sex cargos
+           mapM_ putStrLn $ candidaturas2 cargos listas names

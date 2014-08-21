@@ -30,3 +30,4 @@ executable hs-nombre-generator
                      , hxt
                      , HandsomeSoup
                      , random
+                     , transformers
