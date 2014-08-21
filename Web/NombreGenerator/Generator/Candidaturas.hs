@@ -1,6 +1,7 @@
 module Web.NombreGenerator.Generator.Candidaturas (Cargo, FullName, candidaturas) where
 
 import Text.Printf
+import Control.Monad.Trans.State.Lazy
 
 type FullName = (String, String)
 type Cargo = (String, Int, Bool)
@@ -14,15 +15,15 @@ data Candidato = Candidato { uid :: Int
                            , orden :: Int
                            } deriving (Show)
 
-candidato_format_sql = "('%03d.%03d.%03d', 'Candidato', '%s', '%s', 'NO', 'SI', '{\"norden\": %d, \"titular\": \"%s\", \"sexo\": \"%s\"}'),"
+candidato_format_sql = "('001.%03d.%03d', 'Candidato', '%s', '%s', 'NO', 'SI', '{\"norden\": %d, \"titular\": \"%s\", \"sexo\": \"%s\"}'),"
 candidato_format_csv = "%03d,%03d,%s,,,EJ,\"%s\",%s,%s,,NO,SI,%d"
-
-candidaturas :: [Cargo] -> [FullName] -> IO [String]
-candidaturas cats names = return $ reverse $ map fromatCand $ loop1 [] 1 cats names
 
 fromatCand :: Candidato -> String
 fromatCand (Candidato i l n c s t' o) = printf candidato_format_csv i l n c s t o
     where t = if t' then "SI" else "NO"
+
+candidaturas :: [Cargo] -> Int -> [FullName] -> IO [String]
+candidaturas cats listas names = return $ reverse $ map fromatCand $ loop1 [] 1 cats names
 
 loop1 :: [Candidato] -> Int -> [Cargo] -> [FullName] -> [Candidato]
 loop1 acc _ [] _ = acc

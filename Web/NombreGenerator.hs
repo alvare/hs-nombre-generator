@@ -13,15 +13,15 @@ import Web.NombreGenerator.Scrapper.BsAs
 
 type Sex = String
 
-parseArgs :: [String] -> IO ([Cargo], Sex)
+parseArgs :: [String] -> IO ([Cargo], Sex, Int)
 parseArgs ["-h"] = printUsage >> exit
 parseArgs ["-v"] = printVersion >> exit
-parseArgs ["-f", cargs] = return $ eval (cargs, "f")
-parseArgs ["-m", cargs] = return $ eval (cargs, "m")
-parseArgs [cargs] = return $ eval (cargs, "a")
+parseArgs ["-f", cargs, listas] = return $ eval (cargs, "f", listas)
+parseArgs ["-m", cargs, listas] = return $ eval (cargs, "m", listas)
+parseArgs [cargs, listas] = return $ eval (cargs, "a", listas)
 parseArgs _ = printUsage >> die
 
-eval (c, s) = (read c :: [Cargo]) `seq` (read c :: [Cargo], s)
+eval (c, s, l) = (read c :: [Cargo]) `seq` (read l :: Int) `seq` (read c :: [Cargo], s, read l :: Int)
 
 printUsage = putStrLn "Usage: hs-nombre-generator [-h] [-m/-f] '[('CARGO', Int, False|True), etc]'"
 printVersion = putStrLn $ "NombreGenerator " ++ showVersion version
@@ -45,7 +45,7 @@ generate names sex cargos = (fmap (filter isSex) . randTriples count) =<< names
           count = sum . map (\(_, n, supl) -> if supl then n * 2 else n) $ cargos
 
 main = getArgs >>=
-       parseArgs >>= \(cargos, sex) ->
+       parseArgs >>= \(cargos, sex, listas) ->
            generate scrap sex cargos >>=
-           candidaturas cargos >>=
+           candidaturas cargos listas >>=
            mapM_ putStrLn
