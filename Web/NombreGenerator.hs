@@ -38,13 +38,13 @@ format names_sex = (c ++ ", " ++ a ++ " " ++ b, custom_sex)
 randTriples :: Int -> [(String, String)] -> IO [(String, String)]
 randTriples n list = replicateM n (fmap format $ takeRandom 3 list)
 
-generate :: IO [Name] -> Sex -> [Cargo] -> IO [FullName]
-generate names sex cargos = (fmap (filter isSex) . randTriples count) =<< names
+generate :: IO [Name] -> Sex -> [Cargo] -> Int -> IO [FullName]
+generate names sex cargos listas = (fmap (filter isSex) . randTriples count) =<< names
     where isSex (_, s) = sex == "a" || (lower s) == sex
           lower = map toLower
-          count = sum . map (\(_, n, supl) -> if supl then n * 2 else n) $ cargos
+          count = (*) listas $ sum . map (\(_, n, supl) -> if supl then n * 2 else n) $ cargos
 
 main = getArgs >>=
        parseArgs >>= \(cargos, sex, listas) -> do
-           names <- generate scrap sex cargos
+           names <- generate scrap sex cargos listas
            mapM_ putStrLn $ candidaturas2 cargos listas names
